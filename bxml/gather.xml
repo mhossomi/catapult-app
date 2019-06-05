@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<Response>
+    <Gather requestUrl="http://48f472a0.ngrok.io/callback" maxDigits="1" terminatingDigits="#">
+        <SpeakSentence gender="female" voice="susan" locale="en_US">
+            Please dial something.
+        </SpeakSentence>
+    </Gather>
+</Response>

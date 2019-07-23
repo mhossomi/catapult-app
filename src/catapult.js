@@ -1,14 +1,27 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const bxml = require('./bxml')
+const ngrok = require('./ngrok')
+const heroku = require('./heroku')
 
-const SEP = '-'.repeat(30)
+// ==================================================
 
 var settings = {
     showParams: true,
     showHeaders: false,
     pretty: true
 }
+
+// Register ngrok or Heroku urls if detected
+ngrok.getPublicUrls()
+    .then(urls => urls || heroku.getPublicUrls())
+    .then(urls => urls || [])
+    .then(urls => {
+        console.log(`Found ${urls.length} URLs!`)
+        urls.forEach(tunnel => process.env[`${tunnel.proto.toUpperCase()}_SELF`] = tunnel.public_url)
+    })
+
+// ==================================================
 
 function settingsHandler(req, res) {
     settings = Object.keys(settings)
@@ -21,7 +34,7 @@ function settingsHandler(req, res) {
 
 function loggingHandler(req, res, next) {
     let time = new Date().toISOString().replace('T', ' ')
-    let lines = [SEP, `${time} ${req.method} ${req.baseUrl}`]
+    let lines = ['-'.repeat(30), `${time} ${req.method} ${req.baseUrl}`]
 
     if (settings.showParams && Object.keys(req.query).length > 0) {
         lines.push('Params:')
@@ -45,11 +58,15 @@ function loggingHandler(req, res, next) {
     next()
 }
 
+// ==================================================
+
 module.exports = (name, port, configurer) => {
+    process.env.HTTP_SELF = process.env.HTTP_SELF || `localhost:${port}`
+    process.env.HTTPS_SELF = process.env.HTTPS_SELF || `localhost:${port}`
     configurer(express()
         .use(bodyParser.json())
         .put('/settings', settingsHandler)
         .use('/*', loggingHandler)
-        .get('/preset/:name', bxml.handler.fromParamToPreset('name'))
-    ).listen(port, () => console.log(`Catapult '${name}' listening at ${port}`))
+        .use('/bxml/*', bxml.handler)
+    ).listen(port, () => console.log(`Slingshot '${name}' listening at ${port}`))
 }

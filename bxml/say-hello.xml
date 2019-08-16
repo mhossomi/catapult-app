@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <Response>
     <SpeakSentence gender="female" voice="susan" locale="en_US">
-        Hello world!
+        Hi, all your base are belong to us now.
     </SpeakSentence>
 </Response>

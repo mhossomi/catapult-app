@@ -1,6 +1,5 @@
 <?xml version="1.0" ?>
 <Response>
-    <PlayAudio>
-        http://192.168.113.58/3-minute-audio.wav
-   </PlayAudio>
+    <PlayAudio volume="4">${env.HTTP_SELF}/audio/callwillberecorded.mp3</PlayAudio>
+    <Hangup/>
 </Response>
